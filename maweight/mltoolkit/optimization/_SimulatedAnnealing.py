@@ -6,6 +6,7 @@ import glob
 import datetime
 import os
 import os.path
+import tqdm
 
 import sklearn.svm as svm
 import sklearn.preprocessing as preprocessing
@@ -25,7 +26,7 @@ from scipy.stats import skew
 
 import math
 
-from mltoolkit.base import RandomStateMixin, VerboseLoggingMixin
+from maweight.mltoolkit.base import RandomStateMixin, VerboseLoggingMixin
 from ._OptimizationBase import OptimizationBase
 
 __all__=['SimulatedAnnealing']
@@ -53,7 +54,6 @@ class SimulatedAnnealing(OptimizationBase, RandomStateMixin, VerboseLoggingMixin
         
         if self.annealing_rate == 'auto':
             self.annealing_rate= np.power(self.eps/self.T_init, 1.0/self.max_iterations)
-        print(self.annealing_rate)
         
         def stopping(x):
             if len(x) < 1000:
@@ -81,7 +81,7 @@ class SimulatedAnnealing(OptimizationBase, RandomStateMixin, VerboseLoggingMixin
             multiplier= -1
 
         self.verbose_logging(1, 'executing the main iteration')
-        for i in range(self.max_iterations):
+        for i in tqdm.tqdm(range(self.max_iterations)):
             T*= self.annealing_rate
 
             self.verbose_logging(2, 'mutating the object')

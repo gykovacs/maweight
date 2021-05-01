@@ -5,3 +5,5 @@ scipy
 imageio
 nibabel
 scikit-learn
+xgboost
+jsonlines

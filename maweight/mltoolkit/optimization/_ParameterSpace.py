@@ -2,7 +2,7 @@ import numpy as np
 import copy
 import json
 
-from mltoolkit.base import RandomStateMixin
+from maweight.mltoolkit.base import RandomStateMixin
 
 class ParameterBase(RandomStateMixin):
     pass

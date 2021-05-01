@@ -1,15 +1,16 @@
 import numpy as np
 
 from ._regressors import *
-from mltoolkit.optimization import EvolutionaryAlgorithm, SimulatedAnnealing
-from mltoolkit.base import VerboseLoggingMixin
-from mltoolkit.automl import FeatureSelectionRegressor, R2_score
+from maweight.mltoolkit.optimization import EvolutionaryAlgorithm, SimulatedAnnealing
+from maweight.mltoolkit.base import VerboseLoggingMixin
+from maweight.mltoolkit.automl import FeatureSelectionRegressor, R2_score
 
 from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.model_selection import RepeatedKFold, RepeatedStratifiedKFold
 import sklearn.preprocessing as preprocessing
 
 from sklearn.ensemble import BaggingRegressor
+import tqdm
 
 import copy
 import os
@@ -142,7 +143,7 @@ class ModelSelection(VerboseLoggingMixin):
         all_indices= []
 
         i=0
-        for train, test in validator.split(X, y):
+        for train, test in tqdm.tqdm(validator.split(X, y)):
             X_train, X_test= X[train], X[test]
             y_train, y_test= y[train], y[test]
             i=i+1

@@ -31,7 +31,7 @@ import xgboost
 from sklearn.linear_model import LinearRegression
 
 from ._ModelSelectionObjective import *
-from mltoolkit.optimization import ParameterSpace, UniformIntegerParameter, CategorialParameter, FixedParameter, JointParameterSpace
+from maweight.mltoolkit.optimization import ParameterSpace, UniformIntegerParameter, CategorialParameter, FixedParameter, JointParameterSpace
 
 random_state= 11
 
@@ -301,7 +301,7 @@ class RidgeRegression_Objective(ModelSelectionObjectiveMixin):
         params_ml= ParameterSpace({'fit_intercept': FixedParameter(True), #UniformIntegerParameter(0, 1, random_state=self._random_state_init),
                                    'normalize': FixedParameter(True),
                                    'alpha': CategorialParameter([0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0]),
-                                   'random_state': FixedParameter(t)}, random_state=self._random_state_init)
+                                   'random_state': FixedParameter(5)}, random_state=self._random_state_init)
         params= JointParameterSpace({'ml': params_ml, 'features': super().get_default_parameter_space()})
         return params
 

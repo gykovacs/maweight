@@ -10,6 +10,7 @@ __all__=['ModelSelectionObjectiveMixin',
 
 import numpy as np
 import json
+import tqdm
 
 from sklearn.metrics import confusion_matrix, roc_auc_score
 import sklearn.preprocessing as preprocessing
@@ -26,8 +27,8 @@ from sklearn.base import ClassifierMixin, RegressorMixin
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.ensemble import BaggingClassifier, BaggingRegressor
 
-from mltoolkit.base import CacheBase, VerboseLoggingMixin, RandomStateMixin
-from mltoolkit.optimization import *
+from maweight.mltoolkit.base import CacheBase, VerboseLoggingMixin, RandomStateMixin
+from maweight.mltoolkit.optimization import *
 
 from xgboost import XGBRegressor, XGBClassifier
 from sklearn.preprocessing import StandardScaler

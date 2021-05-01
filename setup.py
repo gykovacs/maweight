@@ -24,7 +24,8 @@ setup(name='maweight',
               'nibabel',
               'imageio',
               'scipy',
-              'scikit-learn'
+              'scikit-learn',
+              'xgboost'
               ],
       test_suite='nose.collector',
       tests_require=['nose'],

@@ -38,7 +38,7 @@ from scipy.stats import skew
 import logging
 
 from ._OptimizationBase import *
-from mltoolkit.base import VerboseLoggingMixin
+from maweight.mltoolkit.base import VerboseLoggingMixin
 
 class EvolutionaryAlgorithm(OptimizationBase, VerboseLoggingMixin):
     def __init__(self,
