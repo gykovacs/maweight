@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+
+import maweight
+import argparse
+
+parser= argparse.ArgumentParser(description='maweight application')
+parser.add_argument('--moving', type=str, required=True, help='moving image path')
+parser.add_argument('--fixed', type=str, required=True, help='fixed image path')
+parser.add_argument('--to_fit', nargs='+', type=str, required=True, help='names of the images to fit along the moving one')
+parser.add_argument('--output_names', nargs='+', type=str, required=True, help='names of the output images to save')
+parser.add_argument('--work_dir', type=str, default=None, help='working directory path (will be emptied!)')
+parser.add_argument('--threads', type=int, default=4, help='number of threads used for registration')
+parser.add_argument('--elastix_path', type=str, default=None, help='path of the elastix executable')
+parser.add_argument('--transformix_path', type=str, default=None, help='path of the transformix executable')
+parser.add_argument('--reg_im_path', type=str, default=None, help='path to save the registered image to')
+parser.add_argument('--verbosity', type=int, choices=[0, 1, 2], default=0, help='verbosity level')
+
+arguments= vars(parser.parse_args())
+
+maweight.register_and_transform(moving= arguments['moving'],
+                              fixed= arguments['fixed'],
+                              to_fit= arguments['to_fit'],
+                              output_names= arguments['output_names'],
+                              threads= arguments['threads'],
+                              work_dir= arguments['work_dir'],
+                              elastix_path= arguments['elastix_path'],
+                              transformix_path= arguments['transformix_path'],
+                              registered_image_path= arguments['reg_im_path'],
+                              verbose= arguments['verbosity'])

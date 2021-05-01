@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb 27 23:32:49 2018
+
+@author: gykovacs
+"""
+
+import argparse
+import nibabel as nib
+
+parser= argparse.ArgumentParser(description='offset origin to [0, 0, 0]')
+parser.add_argument('--input', type=str, required=True, help='input file')
+parser.add_argument('--output', type=str, required=True, help='output file')
+
+arguments= vars(parser.parse_args())
+
+image= nib.load(arguments['input'])
+
+affine= image.affine
+affine[0][3]= 0
+affine[1][3]= 0
+affine[2][3]= 0
+affine[3][3]= 1
+
+transformed_image= nib.Nifti1Image(image.get_data(), affine)
+
+nib.save(transformed_image, arguments['output'])
