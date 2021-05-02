@@ -221,18 +221,22 @@ class ParameterSpace(RandomStateMixin):
         return ParameterSpace.decode_ndarrays(json.loads(parameters))
 
 class BinaryVectorParameter(ParameterBase, ParameterSpace):
-    def __init__(self, n, n_lower=1, n_upper=None, n_init=None, random_state=None):
+    def __init__(self, n, n_lower=1, n_upper=None, n_init=None, random_state=None, disabled=False):
         self.n= n
         self.n_lower= n_lower
         self.n_upper= n_upper
         self.n_init= n_init
+        self.disabled= disabled
         
         ParameterBase.__init__(self)
         ParameterSpace.__init__(self, {'binary_vector': self}, random_state)
     
     def sample(self):
-        tmp= np.repeat(False, self.n)
-        tmp[self.random_state.choice(list(range(self.n)), self.n_init or int(self.n/2), replace=False)]= True
+        if not self.disabled:
+            tmp= np.repeat(False, self.n)
+            tmp[self.random_state.choice(list(range(self.n)), self.n_init or int(self.n/2), replace=False)]= True
+        else:
+            tmp= np.repeat(True, self.n)
         
         return tmp
     
@@ -267,6 +271,9 @@ class BinaryVectorParameter(ParameterBase, ParameterSpace):
             return tmp
     
     def mutate(self, parameter, rate= None):
+        if self.disabled:
+            return parameter
+        
         new_parameter= parameter.copy()
         current_n= np.sum(new_parameter)
 
@@ -303,6 +310,8 @@ class BinaryVectorParameter(ParameterBase, ParameterSpace):
         return tmp
     
     def crossover(self, parameter1, parameter2, crossover_rate= 0.9):
+        if self.disabled:
+            return parameter1
         new_parameter= parameter1.copy()
 
         for i in range(len(parameter2)):

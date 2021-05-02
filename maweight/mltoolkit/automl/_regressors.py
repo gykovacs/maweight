@@ -53,12 +53,13 @@ class XGBR_Objective(ModelSelectionObjectiveMixin):
                     score_functions=None,
                     validator=None,
                     oversampler=None,
+                    disable_feature_selection=False,
                     random_state=random_state,
                     cache_path=None,
                     verbosity=2):
         super().__init__(xgboost.XGBRegressor, X, y, sample_weights, groups, evaluation_weights,
                             X_val, y_val, sample_weights_val, groups_val, evaluation_weights_val,
-                            feature_groups, reverse, preprocessor, score_functions, validator, oversampler, random_state, cache_path, verbosity)
+                            feature_groups, reverse, preprocessor, score_functions, validator, oversampler, disable_feature_selection, random_state, cache_path, verbosity)
         
         self._default_ml_parameter_space= ParameterSpace({'max_depth': UniformIntegerParameter(2, 5),
                                                             'n_estimators': FixedParameter(100),
@@ -99,12 +100,13 @@ class KNNR_Objective(ModelSelectionObjectiveMixin):
                     score_functions= None, 
                     validator= None,
                     oversampler= None,
+                    disable_feature_selection=False,
                     random_state= random_state,
                     cache_path= None,
                     verbosity= 2):
         super().__init__(neighbors.KNeighborsRegressor, X, y, sample_weights, groups, evaluation_weights,
                             X_val, y_val, sample_weights_val, groups_val, evaluation_weights_val,
-                            feature_groups, reverse, preprocessor, score_functions, validator, oversampler, random_state, cache_path, verbosity)
+                            feature_groups, reverse, preprocessor, score_functions, validator, oversampler, disable_feature_selection, random_state, cache_path, verbosity)
         
         self._default_ml_parameter_space= ParameterSpace({'n_neighbors': UniformIntegerParameter(1, 13),
                                                             'weights': CategorialParameter(['uniform', 'distance']),
@@ -143,12 +145,13 @@ class SVR_Poly_Objective(ModelSelectionObjectiveMixin):
                     score_functions= None, 
                     validator= None,
                     oversampler= None,
+                    disable_feature_selection=False,
                     random_state= random_state,
                     cache_path= None,
                     verbosity= 2):
         super().__init__(svm.SVR, X, y, sample_weights, groups, evaluation_weights,
                             X_val, y_val, sample_weights_val, groups_val, evaluation_weights_val,
-                            feature_groups, reverse, preprocessor, score_functions, validator, oversampler, random_state, cache_path, verbosity)
+                            feature_groups, reverse, preprocessor, score_functions, validator, oversampler, disable_feature_selection, random_state, cache_path, verbosity)
     
     def get_default_parameter_space(self):
         """
@@ -184,12 +187,13 @@ class SVR_RBF_Objective(ModelSelectionObjectiveMixin):
                     score_functions= None, 
                     validator= None,
                     oversampler= None,
+                    disable_feature_selection=False,
                     random_state= random_state,
                     cache_path= None,
                     verbosity= 2):
         super().__init__(svm.SVR, X, y, sample_weights, groups, evaluation_weights,
                             X_val, y_val, sample_weights_val, groups_val, evaluation_weights_val,
-                            feature_groups, reverse, preprocessor, score_functions, validator, oversampler, random_state, cache_path, verbosity)
+                            feature_groups, reverse, preprocessor, score_functions, validator, oversampler, disable_feature_selection, random_state, cache_path, verbosity)
     
     def get_default_parameter_space(self):
         """
@@ -224,13 +228,14 @@ class LinearRegression_Objective(ModelSelectionObjectiveMixin):
                     score_functions=None,
                     validator=None,
                     oversampler=None,
+                    disable_feature_selection=False,
                     random_state=random_state,
                     cache_path=None,
                     verbosity=2):
         super().__init__(linear_model.LinearRegression, X, y, sample_weights, groups, evaluation_weights,
                         X_val, y_val, sample_weights_val, groups_val, evaluation_weights_val,
                         feature_groups, reverse, preprocessor, score_functions, validator, oversampler, 
-                        random_state, cache_path, verbosity)
+                        disable_feature_selection, random_state, cache_path, verbosity)
     
     def get_default_parameter_space(self):
         params_ml= ParameterSpace({'fit_intercept': UniformIntegerParameter(0, 1, random_state=self._random_state_init)}, random_state=self._random_state_init)
@@ -255,13 +260,14 @@ class LassoRegression_Objective(ModelSelectionObjectiveMixin):
                     score_functions=None,
                     validator=None,
                     oversampler=None,
+                    disable_feature_selection=False,
                     random_state=random_state,
                     cache_path=None,
                     verbosity=2):
         super().__init__(linear_model.Lasso, X, y, sample_weights, groups, evaluation_weights,
                         X_val, y_val, sample_weights_val, groups_val, evaluation_weights_val,
                         feature_groups, reverse, preprocessor, score_functions, validator, oversampler, 
-                        random_state, cache_path, verbosity)
+                        disable_feature_selection, random_state, cache_path, verbosity)
     
     def get_default_parameter_space(self):
         params_ml= ParameterSpace({'fit_intercept': FixedParameter(True), #UniformIntegerParameter(0, 1, random_state=self._random_state_init),
@@ -289,13 +295,14 @@ class RidgeRegression_Objective(ModelSelectionObjectiveMixin):
                     score_functions=None,
                     validator=None,
                     oversampler=None,
+                    disable_feature_selection=False,
                     random_state=random_state,
                     cache_path=None,
                     verbosity=2):
         super().__init__(linear_model.Ridge, X, y, sample_weights, groups, evaluation_weights,
                         X_val, y_val, sample_weights_val, groups_val, evaluation_weights_val,
                         feature_groups, reverse, preprocessor, score_functions, validator, oversampler, 
-                        random_state, cache_path, verbosity)
+                        disable_feature_selection, random_state, cache_path, verbosity)
     
     def get_default_parameter_space(self):
         params_ml= ParameterSpace({'fit_intercept': FixedParameter(True), #UniformIntegerParameter(0, 1, random_state=self._random_state_init),
@@ -323,12 +330,13 @@ class PLSRegression_Objective(ModelSelectionObjectiveMixin):
                     score_functions=None,
                     validator=None,
                     oversampler=None,
+                    disable_feature_selection=False,
                     random_state=random_state,
                     cache_path=None,
                     verbosity=2):
         super().__init__(cross_decomposition.PLSRegression, X, y, sample_weights, groups, evaluation_weights,
                         X_val, y_val, sample_weights_val, groups_val, evaluation_weights_val,
-                        feature_groups, reverse, preprocessor, score_functions, validator, oversampler, random_state, cache_path, verbosity)
+                        feature_groups, reverse, preprocessor, score_functions, validator, oversampler, disable_feature_selection, random_state, cache_path, verbosity)
     
     def get_default_parameter_space(self):
         max_components= int(np.sqrt(len(self.X[0])))

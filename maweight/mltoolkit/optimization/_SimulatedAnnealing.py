@@ -56,10 +56,10 @@ class SimulatedAnnealing(OptimizationBase, RandomStateMixin, VerboseLoggingMixin
             self.annealing_rate= np.power(self.eps/self.T_init, 1.0/self.max_iterations)
         
         def stopping(x):
-            if len(x) < 1000:
+            if len(x) < 500:
                 return False
             else:
-                return np.max(x[-1000:])  - np.min(x[-1000:]) < 1e-5
+                return np.max(x[-500:])  - np.min(x[-500:]) < 1e-5
         
         self.fn_stopping_condition= stopping
 

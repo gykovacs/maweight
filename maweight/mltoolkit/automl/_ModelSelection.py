@@ -35,6 +35,7 @@ class ModelSelection(VerboseLoggingMixin):
                     preprocessor= None,
                     score_functions= None,
                     validator= None,
+                    disable_feature_selection=False,
                     random_state= None,
                     optimizer=SimulatedAnnealing(),
                     cache_dir= None,
@@ -55,6 +56,7 @@ class ModelSelection(VerboseLoggingMixin):
         self.preprocessor= preprocessor
         self.score_functions= score_functions
         self.validator= validator
+        self.disable_feature_selection=disable_feature_selection
         self.random_state= random_state
         self.cache_dir= cache_dir
         self.optimizer= optimizer
@@ -70,7 +72,8 @@ class ModelSelection(VerboseLoggingMixin):
         self.objective_instance= self.objective(self.X, self.y, self.sample_weights, self.groups, self.evaluation_weights,
                                     self.X_val, self.y_val, self.sample_weights_val, self.groups_val,
                                     self.evaluation_weights_val, self.feature_groups, self.reverse,
-                                    self.preprocessor, self.score_functions, self.validator, None, self.random_state, cache_path, self.verbosity)
+                                    self.preprocessor, self.score_functions, self.validator, None, self.disable_feature_selection,
+                                    self.random_state, cache_path, self.verbosity)
 
         self.verbose_logging(1, "Executing model selection with objective %s" % self.objective.__name__)
         self.result= self.optimizer.execute(self.objective_instance)

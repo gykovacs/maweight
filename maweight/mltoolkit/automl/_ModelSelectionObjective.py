@@ -318,6 +318,7 @@ class ModelSelectionObjectiveMixin(RandomStateMixin, CacheBase, VerboseLoggingMi
                  score_functions= None,
                  validator=None,
                  oversampler=None,
+                 disable_feature_selection=False,
                  random_state= None,
                  cache_path= None,
                  verbosity= 2):
@@ -343,6 +344,7 @@ class ModelSelectionObjectiveMixin(RandomStateMixin, CacheBase, VerboseLoggingMi
         self.score_functions= score_functions
         self.validator= validator
         self.oversampler= oversampler
+        self.disable_feature_selection=disable_feature_selection
         self.set_random_state(random_state)
         self.verbosity= verbosity
 
@@ -360,7 +362,7 @@ class ModelSelectionObjectiveMixin(RandomStateMixin, CacheBase, VerboseLoggingMi
     def get_default_parameter_space(self):
         if self.feature_groups is None:
             n_init= 1 if not self.reverse else len(self.X[0])
-            return BinaryVectorParameter(len(self.X[0]), n_init=n_init, random_state=self._random_state_init)
+            return BinaryVectorParameter(len(self.X[0]), n_init=n_init, random_state=self._random_state_init, disabled=self.disable_feature_selection)
         else:
             n_init= 1 if not self.reverse else len(self.feature_groups)
             return GroupedBinaryVectorParameter(length= len(self.X[0]), groups= self.feature_groups, n_init=n_init, random_state=self._random_state_init)
