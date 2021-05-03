@@ -15,7 +15,7 @@ If you use the package, please consider citing the paper:
 .. code-block:: BibTex
 
     @article{Csoka2021,
-        authors={\'Ad\'am Cs\'oka and Gy\"orgy Kov\'acs and Vir\'ag \'Acs and Zsolt Matics and Zsolt Gerencs\'er and Zsolt Szendr\"o and \"Ors Petneh\'azy and Imre Repa and Mariann Moizs and Tam\'as Donk\'o},
+        author={\'Ad\'am Cs\'oka and Gy\"orgy Kov\'acs and Vir\'ag \'Acs and Zsolt Matics and Zsolt Gerencs\'er and Zsolt Szendr\"o and \"Ors Petneh\'azy and Imre Repa and Mariann Moizs and Tam\'as Donk\'o},
         title={Multi-atlas segmentation based estimation of weights from CT scans in farm animal imaging and its applications to rabbit breeding programs},
         year={2021}
     }
