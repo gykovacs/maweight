@@ -518,7 +518,14 @@ class ModelSelectionObjectiveMixin(RandomStateMixin, CacheBase, VerboseLoggingMi
     def instantiate_base(self, parameters):
         if 'n_components' in parameters['ml'] and parameters['ml']['n_components'] > np.sum(parameters['features']):
             parameters['ml']['n_components']= np.sum(parameters['features'])
-        return self.base_class(**(parameters['ml']))
+        from sklearn import linear_model
+        from sklearn import pipeline
+        if (not self.base_class == linear_model.Lasso) and (not self.base_class == linear_model.Ridge):
+            return self.base_class(**(parameters['ml']))
+        elif self.base_class == linear_model.Lasso:
+            return pipeline.make_pipeline(StandardScaler(with_mean=False), linear_model.Lasso(**(parameters['ml'])))
+        elif self.base_class == linear_model.Ridge:
+            return pipeline.make_pipeline(StandardScaler(with_mean=False), linear_model.Ridge(**(parameters['ml'])))
 
     def instantiate(self, parameters, features_to_ignore=None):
         """

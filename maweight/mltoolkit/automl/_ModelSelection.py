@@ -135,15 +135,20 @@ class ModelSelection(VerboseLoggingMixin):
                 score_functions= [ACC_score()]
             else:
                 score_functions= [R2_score()]
+        
+        score_functions_per_fold= [s.__class__() for s in score_functions]
 
         model= tmp['model']
 
         for s in score_functions:
             s.reset()
+        for s in score_functions_per_fold:
+            s.reset()
 
         all_tests= []
         all_preds= []
         all_indices= []
+        scores_per_fold= [[] for s in score_functions_per_fold]
 
         i=0
         for train, test in tqdm.tqdm(validator.split(X, y)):
@@ -165,6 +170,19 @@ class ModelSelection(VerboseLoggingMixin):
 
             for s in score_functions:
                 s.accumulate(y_test, y_pred)
+            
+            for s in score_functions_per_fold:
+                s.accumulate(y_test, y_pred)
+            
+            for i, s in enumerate(score_functions_per_fold):
+                scores_per_fold[i].append(s.score())
+            
+            for s in score_functions_per_fold:
+                s.reset()
         print(i)
 
-        return {'scores': [s.score() for s in score_functions], 'y_test': np.hstack(all_tests), 'y_pred': np.hstack(all_preds), 'y_indices': np.hstack(all_indices)}
+        return {'scores': [s.score() for s in score_functions],
+                'scores_per_fold': scores_per_fold,
+                'y_test': np.hstack(all_tests), 
+                'y_pred': np.hstack(all_preds), 
+                'y_indices': np.hstack(all_indices)}

@@ -558,7 +558,11 @@ def model_selection(features,
             results['rmse_' + str(i)]= tmp['scores'][1]
             results['y_test_' + str(i)]= tmp['y_test']
             results['y_pred_' + str(i)]= tmp['y_pred']
-            results['y_indices_' + str(i)]= str(tmp['y_indices'])
+            results['y_indices_' + str(i)]= tmp['y_indices']
+            results['r2_per_fold_' + str(i)]= tmp['scores_per_fold'][0]
+            results['rmse_per_fold_' + str(i)]= tmp['scores_per_fold'][1]
+            results['r2_std_' + str(i)]= np.std(tmp['scores_per_fold'][0])
+            results['rmse_std_' + str(i)]= np.std(tmp['scores_per_fold'][1])
             print(i, results['r2_' + str(i)])
         results['dataset']= dataset
         results['type']= type

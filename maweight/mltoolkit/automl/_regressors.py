@@ -13,7 +13,8 @@ __all__=['KNNR_Objective',
         'LinearRegression_Objective',
         'LassoRegression_Objective',
         'RidgeRegression_Objective',
-        'PLSRegression_Objective']
+        'PLSRegression_Objective',
+        'RFR_Objective']
 
 import numpy as np
 
@@ -81,6 +82,50 @@ class XGBR_Objective(ModelSelectionObjectiveMixin):
 
     def instantiate_base(self, parameters):
         return self.base_class(**(parameters['ml']), objective='reg:squarederror')
+    
+class RFR_Objective(ModelSelectionObjectiveMixin):
+    def __init__(self,
+                    X,
+                    y,
+                    sample_weights=None,
+                    groups=None,
+                    evaluation_weights=None,
+                    X_val=None,
+                    y_val=None,
+                    sample_weights_val=None,
+                    groups_val=None,
+                    evaluation_weights_val=None,
+                    feature_groups=None,
+                    reverse=False,
+                    preprocessor=None,
+                    score_functions=None,
+                    validator=None,
+                    oversampler=None,
+                    disable_feature_selection=False,
+                    random_state=random_state,
+                    cache_path=None,
+                    verbosity=2):
+        super().__init__(ensemble.RandomForestRegressor, X, y, sample_weights, groups, evaluation_weights,
+                            X_val, y_val, sample_weights_val, groups_val, evaluation_weights_val,
+                            feature_groups, reverse, preprocessor, score_functions, validator, oversampler, disable_feature_selection, random_state, cache_path, verbosity)
+        
+        self._default_ml_parameter_space= ParameterSpace({'max_depth': UniformIntegerParameter(2, 5),
+                                                            'n_estimators': FixedParameter(100),
+                                                            'random_state': FixedParameter(random_state)}, random_state=self._random_state_init)
+        self._default_features_parameter_space= super().get_default_parameter_space()
+        if not oversampler is None:
+            self._oversampler_parameter_space= CategorialParameter(np.random.choice(oversampler.parameter_combinations(), 35))
+            self._default_parameter_space= JointParameterSpace({'ml': self._default_ml_parameter_space, 'features': self._default_features_parameter_space, 'oversampler': self._oversampler_parameter_space})
+        else:
+            self._default_parameter_space= JointParameterSpace({'ml': self._default_ml_parameter_space, 'features': self._default_features_parameter_space})
+
+    def get_default_parameter_space(self):
+        """
+        Get default parameter descriptors.
+        Returns:
+            dict: dictionary of default parameter descriptors.
+        """
+        return self._default_parameter_space
 
 class KNNR_Objective(ModelSelectionObjectiveMixin):
     def __init__(self, 
@@ -271,7 +316,6 @@ class LassoRegression_Objective(ModelSelectionObjectiveMixin):
     
     def get_default_parameter_space(self):
         params_ml= ParameterSpace({'fit_intercept': FixedParameter(True), #UniformIntegerParameter(0, 1, random_state=self._random_state_init),
-                                   'normalize': FixedParameter(True),
                                    'alpha': CategorialParameter([0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0]),
                                    'random_state': FixedParameter(5)}, random_state=self._random_state_init)
         params= JointParameterSpace({'ml': params_ml, 'features': super().get_default_parameter_space()})
@@ -306,7 +350,6 @@ class RidgeRegression_Objective(ModelSelectionObjectiveMixin):
     
     def get_default_parameter_space(self):
         params_ml= ParameterSpace({'fit_intercept': FixedParameter(True), #UniformIntegerParameter(0, 1, random_state=self._random_state_init),
-                                   'normalize': FixedParameter(True),
                                    'alpha': CategorialParameter([0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0]),
                                    'random_state': FixedParameter(5)}, random_state=self._random_state_init)
         params= JointParameterSpace({'ml': params_ml, 'features': super().get_default_parameter_space()})
