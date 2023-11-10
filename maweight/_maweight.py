@@ -143,13 +143,13 @@ def parameters_default(image_dim= 3, default_pixel_value= 0):
              'Optimizer': "AdaptiveStochasticGradientDescent",
              'MaximumNumberOfIterations': 200,
              'FinalGridSpacingInVoxels': [10, 10, 10],
-             'ResultImageFormat': "nii",
+             'ResultImageFormat': "nii.gz",
              'CheckNumberOfSamples': "false",
              "RandomSeed": 5}
     
     return params
         
-def parameters_fast(image_dim= 3, default_pixel_value= 0):
+def parameters_fast(image_dim= 3, default_pixel_value= -1024):
     """
     Returns a faster settings of the parameters.
     Args:
@@ -205,7 +205,7 @@ def _prepare_files(image_parameters, tmp_dir):
         if isinstance(f, str):
             # if argument is filename
             file_arguments.append(f)
-            if f.endswith('.nii'):
+            if f.endswith('.nii') or f.endswith('nii.gz'):
                 image_dim= 3
             elif f[-3:].lower() in ['tif']:
                 image_dim= 2
@@ -213,7 +213,7 @@ def _prepare_files(image_parameters, tmp_dir):
             # if argument is 3D array or NiftiImage object
             if isinstance(f, np.ndarray):
                 f= nib.Nifti1Image(f, affine=np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]))
-            tmp_file= os.path.join(tmp_dir, str(i) + '.nii')
+            tmp_file= os.path.join(tmp_dir, str(i) + '.nii.gz')
             nib.save(f, tmp_file)
             file_arguments.append(tmp_file)
             image_dim= 3
@@ -316,12 +316,12 @@ def register_and_transform(moving,
             
             5) A particular example:
                 
-            register_and_transform('/home/gykovacs/rabbit/etalon/201k.nii',
-                                     '/home/gykovacs/workspaces/rabbit/to_segment/001-a.nii',
-                                     ['/home/gykovacs/workspaces/rabbit/etalon/201k-mld.nii',
-                                      '/home/gykovacs/workspaces/rabbit/etalon/201k-hinds.nii'],
-                                     ['/home/gykovacs/workspaces/rabbit/output/001-a-mld.nii',
-                                      '/home/gykovacs/workspaces/rabbit/output/001-a-hinds.nii'],
+            register_and_transform('/home/gykovacs/rabbit/etalon/201k.nii.gz',
+                                     '/home/gykovacs/workspaces/rabbit/to_segment/001-a.nii.gz',
+                                     ['/home/gykovacs/workspaces/rabbit/etalon/201k-mld.nii.gz',
+                                      '/home/gykovacs/workspaces/rabbit/etalon/201k-hinds.nii.gz'],
+                                     ['/home/gykovacs/workspaces/rabbit/output/001-a-mld.nii.gz',
+                                      '/home/gykovacs/workspaces/rabbit/output/001-a-hinds.nii.gz'],
                                      work_dir= '/home/gykovacs/tmp/')
 
     """
@@ -334,22 +334,22 @@ def register_and_transform(moving,
     
     if elastix_path is None or transformix_path is None:
         raise Exception('elastix and transformix executables cannot be found')
-    
+
     params= params or parameters_default()
-    
+
     tmp_dir= work_dir or tempfile.mkdtemp()
-    
+
     file_arguments, image_dim= _prepare_files([moving, fixed] + to_fit, tmp_dir)
-    
+
     if not image_dim is None:
         params['FixedImageDimension']= image_dim
         params['MovingImageDimension']= image_dim
-        if image_dim == 3:
-            params['ResultImageFormat']= 'nii'
+        if image_dim == 3 and params['ResultImageFormat'] is None:
+            params['ResultImageFormat']= 'nii.gz'
         elif image_dim == 2:
             params['ResultImageFormat']= 'tif'
             params['ResultImagePixelType']= 'float'
-    
+
     params_file= os.path.join(tmp_dir, 'params.txt')
     _save_parameters_to_file(params, params_file)
     
@@ -371,7 +371,10 @@ def register_and_transform(moving,
     
     if not registered_image_path is None:
         if image_dim == 3:
-            shutil.copyfile(os.path.join(tmp_dir, 'result.0.nii'), registered_image_path)
+            if params['ResultImageFormat'] == "nii.gz":
+                shutil.copyfile(os.path.join(tmp_dir, 'result.0.nii.gz'), registered_image_path)
+            else:
+                shutil.copyfile(os.path.join(tmp_dir, 'result.0.nii'), registered_image_path)
         elif image_dim == 2:
             shutil.copyfile(os.path.join(tmp_dir, 'result.0.tif'), registered_image_path)
     
@@ -395,13 +398,19 @@ def register_and_transform(moving,
         
         if output_names is None:
             if image_dim == 3:
-                results.append(nib.load(os.path.join(tmp_dir, 'result.nii')))
-                results[-1].get_data()
+                if params['ResultImageFormat'] == "nii.gz":
+                    results.append(nib.load(os.path.join(tmp_dir, 'result.nii.gz')))
+                else:
+                    results.append(nib.load(os.path.join(tmp_dir, 'result.nii')))
+                results[-1].get_fdata()
             elif image_dim == 2:
                 results.append(imageio.imread(os.path.join(tmp_dir, 'result.tif')))
         else:
             if image_dim == 3:
-                shutil.copyfile(os.path.join(tmp_dir, 'result.nii'), output_names[i])
+                if params['ResultImageFormat'] == "nii.gz":
+                    shutil.copyfile(os.path.join(tmp_dir, 'result.nii.gz'), output_names[i])
+                else:
+                    shutil.copyfile(os.path.join(tmp_dir, 'result.nii'), output_names[i])
                 results.append(output_names[i])
             elif image_dim == 2:
                 shutil.copyfile(os.path.join(tmp_dir, 'result.tif'), output_names[i])
@@ -466,9 +475,9 @@ def extract_features_3d(image,
     """
     
     if isinstance(image, str):
-        image= nib.load(image).get_data()
+        image= nib.load(image).get_fdata()
     elif isinstance(image, nib.Nifti1Image):
-        image= image.get_data()
+        image= image.get_fdata()
     
     features= []
     feature_names= []
@@ -478,9 +487,9 @@ def extract_features_3d(image,
     for m, i in zip(masks,range(len(masks))):
         for t in thresholds:
             if isinstance(m, str):
-                mask= nib.load(m).get_data()
+                mask= nib.load(m).get_fdata()
             elif isinstance(m, nib.Nifti1Image):
-                mask= m.get_data()
+                mask= m.get_fdata()
             else:
                 mask= m
             
@@ -495,9 +504,9 @@ def extract_features_3d(image,
     mean_mask_image= None
     for m, i in zip(masks, range(len(masks))):
         if isinstance(m, str):
-            mask= nib.load(m).get_data()
+            mask= nib.load(m).get_fdata()
         elif isinstance(m, nib.Nifti1Image):
-            mask= m.get_data()
+            mask= m.get_fdata()
         else:
             mask= m
         

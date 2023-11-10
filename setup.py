@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 def readme():
     with open('README.rst') as f:
@@ -17,7 +17,7 @@ setup(name='maweight',
       author='Gyorgy Kovacs',
       author_email='gyuriofkovacs@gmail.com',
       license='GPL3',
-      packages=['maweight', 'maweight.mltoolkit'],
+      packages=find_packages(),
       install_requires=[
               'numpy',
               'pandas',
